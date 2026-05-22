@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>الحجوزات - فندق الخليدي</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:url("https://images.unsplash.com/photo-1566073771259-6a8506099945")
+    no-repeat center center/cover;
+    padding:20px;
+    color:#fff;
+    margin:0;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(15,23,42,0.85);
+    z-index:-1;
+}
+
+/* header */
+.header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.header h2{
+    font-size:28px;
+    margin-bottom:15px;
+}
+
+/* buttons */
+button{
+    padding:12px 18px;
+    border:none;
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    color:#fff;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.top-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+/* container */
+.container{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    max-width:950px;
+    margin:auto;
+}
+
+/* booking card */
+.booking{
+    background:rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    color:#fff;
+    padding:20px;
+    border-radius:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.1);
+    transition:0.3s;
+}
+
+.booking:hover{
+    transform:translateY(-5px);
+}
+
+/* row */
+.row{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,0.1);
+    font-size:15px;
+}
+
+.row:last-child{
+    border-bottom:none;
+}
+
+strong{
+    color:#93c5fd;
+}
+
+/* badges */
+.badge{
+    padding:6px 14px;
+    border-radius:20px;
+    color:#fff;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.user{
+    background:linear-gradient(135deg,#16a34a,#15803d);
+}
+
+.staff{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+/* cancel */
+.cancel{
+    background:linear-gradient(135deg,#ef4444,#b91c1c);
+    margin-top:12px;
+    width:100%;
+}
+
+.empty{
+    text-align:center;
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:15px;
+    font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<h2>فندق الخليدي - الحجوزات</h2>
+
+<div class="top-buttons">
+
+<button onclick="load()">تحديث</button>
+
+<button onclick="history.back()">رجوع</button>
+
+</div>
+
+</div>
+
+<div class="container" id="list"></div>
+
+<script>
+
+function load(){
+
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+let all = [
+
+...requests.map((x,i)=>({
+
+id:i,
+source:"request",
+name:x.name,
+room:x.room,
+price:x.price || "غير محدد",
+date:x.date || "بدون تاريخ",
+status:x.status || "قيد الانتظار",
+type:"زبون"
+
+})),
+
+...bookings.map((x,i)=>({
+
+id:i,
+source:"booking",
+name:x.customer || x.name,
+room:x.room,
+price:x.price || "غير محدد",
+date:x.date || "بدون تاريخ",
+status:x.status || "مؤكد",
+
+/* التعديل المهم */
+type:x.customer ? "زبون" : "موظف"
+
+}))
+
+];
+
+if(all.length === 0){
+
+list.innerHTML = `
+<div class="empty">
+لا توجد حجوزات حالياً
+</div>
+`;
+
+return;
+}
+
+list.innerHTML = all.map(x => `
+
+<div class="booking">
+
+<div class="row">
+<strong>الاسم</strong>
+<span>${x.name}</span>
+</div>
+
+<div class="row">
+<strong>الغرفة</strong>
+<span>${x.room}</span>
+</div>
+
+<div class="row">
+<strong>السعر</strong>
+<span>${x.price}</span>
+</div>
+
+<div class="row">
+<strong>التاريخ</strong>
+<span>${x.date}</span>
+</div>
+
+<div class="row">
+<strong>النوع</strong>
+
+<span class="badge ${x.type=="زبون"?"user":"staff"}">
+${x.type}
+</span>
+
+</div>
+
+<div class="row">
+<strong>الحالة</strong>
+<span>${x.status}</span>
+</div>
+
+<button class="cancel" onclick="cancel('${x.source}',${x.id})">
+إلغاء الحجز
+</button>
+
+</div>
+
+`).join("");
+
+}
+
+/* إلغاء */
+function cancel(type,id){
+
+let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+if(type==="request"){
+
+let room = requests[id].room;
+
+requests.splice(id,1);
+
+let r = rooms.find(r=>r.number==room);
+
+if(r) r.status="متاحة";
+
+}
+
+if(type==="booking"){
+
+let room = bookings[id].room;
+
+bookings.splice(id,1);
+
+let r = rooms.find(r=>r.number==room);
+
+if(r) r.status="متاحة";
+
+}
+
+localStorage.setItem("requests",JSON.stringify(requests));
+localStorage.setItem("bookings",JSON.stringify(bookings));
+localStorage.setItem("rooms",JSON.stringify(rooms));
+
+load();
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>

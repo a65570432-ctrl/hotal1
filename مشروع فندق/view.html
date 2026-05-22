@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظرة عامة على الفندق</title>
+
+<style>
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1f2937, #111827);
+    padding: 20px;
+    color: white;
+    min-height: 100vh;
+}
+
+/* زر الرجوع */
+.back-btn{
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    background: #60a5fa;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bolder;
+}
+
+/* اسم الطالب */
+.student-name{
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* الحاوية الرئيسية */
+.container{
+    max-width: 900px;
+    margin: 80px auto 0;
+}
+
+/* الهيدر */
+.header{
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1{
+    font-size: 50px;
+    color: #60a5fa;
+    margin-bottom: 10px;
+}
+
+.header h3{
+    color: #cbd5e1;
+    font-weight: normal;
+    font-size: 24px;
+}
+
+/* البوكسات */
+.box{
+    background: rgba(255, 255, 255, 0.95);
+    color: #111827;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    transition: 0.3s;
+}
+
+/* العناوين */
+.box h3{
+    color: #0f172a;
+    font-size: 24px;
+    padding-right: 10px;
+}
+
+/* القوائم */
+ul{
+    padding-right: 20px;
+}
+
+li{
+    margin-bottom: 10px;
+    line-height: 1.8;
+}
+
+/* الفقرات */
+p{
+    line-height: 1.9;
+    font-size: 17px;
+}
+
+/* تصميم الجوال */
+@media (max-width: 768px){
+    .header h1{
+        font-size: 36px;
+    }
+
+    .header h3{
+        font-size: 20px;
+    }
+
+    .box{
+        padding: 20px;
+    }
+
+    .student-name{
+        position: static;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .container{
+        margin-top: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- زر الرجوع -->
+<button class="back-btn" onclick="goBack()">
+⬅ رجوع
+</button>
+
+<!-- اسم الطالب -->
+<div class="student-name">
+    ENG: Abdulrhman Ali
+</div>
+
+<div class="container">
+
+    <!-- العنوان -->
+    <div class="header">
+        <h1>فندق الخليدي</h1>
+        <h3>نظرة عامة عن الفندق</h3>
+    </div>
+
+    <!-- الوصف -->
+    <div class="box">
+        <p>
+            فندق الخليدي هو فندق حديث يوفر خدمات الإقامة والراحة للزبائن على مدار الساعة،
+            مع غرف متنوعة وخدمات فندقية مميزة تناسب جميع الاحتياجات.
+        </p>
+    </div>
+
+    <!-- معلومات الفندق -->
+    <div class="box">
+        <h3>معلومات الفندق</h3>
+        <ul>
+            <li>عدد الغرف: 30 غرفة</li>
+            <li>أنواع الغرف: مفردة - مزدوجة - أجنحة</li>
+            <li>خدمة الاستقبال: 24 ساعة</li>
+            <li>خدمة الإنترنت: Wi-Fi مجاني</li>
+            <li>خدمة الغرف: متوفرة</li>
+        </ul>
+    </div>
+
+    <!-- الخدمات -->
+    <div class="box">
+        <h3>خدمات الفندق</h3>
+        <ul>
+            <li>حجز الغرف إلكترونياً</li>
+            <li>تنظيف يومي</li>
+            <li>مطعم داخلي</li>
+            <li>مواقف سيارات مجانية</li>
+            <li>خدمة غسيل الملابس</li>
+        </ul>
+    </div>
+
+    <!-- الرؤية -->
+    <div class="box">
+        <h3>رؤية الفندق</h3>
+        <p>
+            نسعى لتقديم أفضل تجربة إقامة للزوار من خلال الراحة والنظافة
+            والخدمة الممتازة بأعلى معايير الجودة.
+        </p>
+    </div>
+
+</div>
+
+<script>
+function goBack() {
+    if (document.referrer !== "") {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "index.html";
+    }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>الزبون - فندق الخليدي</title>
+
+<style>
+body{
+    font-family: Arial;
+    background: linear-gradient(to right,#1f2937,#111827);
+    padding: 20px;
+    color: white;
+    margin: 0;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+/* عنوان إضافي */
+.title{
+    text-align:center;
+    font-size:18px;
+    opacity:0.8;
+    margin-bottom:20px;
+}
+
+/* صندوق */
+.box{
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+input{
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+button{
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.hidden{display:none}
+
+.panel-btn{
+    background:#111827;
+    color:white;
+}
+
+/* تواصل */
+.contact{
+    background:#111827;
+    color:white;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+    margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>فندق الخليدي</h2>
+<div class="title">نظام الحجز الإلكتروني للغرف</div>
+
+<!-- تسجيل -->
+<div id="loginBox" class="box">
+<h3>تسجيل الدخول</h3>
+
+<input id="name" placeholder="الاسم">
+<input id="phone" placeholder="الهاتف">
+<input id="id" placeholder="الهوية">
+
+<button onclick="login()">دخول</button>
+</div>
+
+<!-- لوحة -->
+<div id="panel" class="box hidden">
+<h3>القائمة</h3>
+
+<button class="panel-btn" onclick="goRooms()">الغرف</button>
+<button class="panel-btn" onclick="showBookings()">حجوزاتي</button>
+<button class="panel-btn" onclick="showInvoice()">الفاتورة</button>
+<button style="background:#ef4444" onclick="logout()">خروج</button>
+
+<!-- تواصل معنا -->
+<div class="contact">
+<h4>تواصل معنا</h4>
+<p>737480942</p>
+<p> info@alkhalidi-hotel.com</p>
+<p> فندق الخليدي - اليمن - تعز - الحصب - مقابل مسجد الشيباني</p>
+</div>
+
+</div>
+
+<!-- عرض -->
+<div id="output" class="box hidden"></div>
+
+<script>
+
+let loginBox = document.getElementById("loginBox");
+let panel = document.getElementById("panel");
+let output = document.getElementById("output");
+
+let user = JSON.parse(localStorage.getItem("currentCustomer"));
+if(user) openPanel();
+
+/* تسجيل */
+function login(){
+
+let nameVal = document.getElementById("name").value.trim();
+let phoneVal = document.getElementById("phone").value.trim();
+let idVal = document.getElementById("id").value.trim();
+
+if(!nameVal || !phoneVal || !idVal){
+    alert("أدخل البيانات كاملة");
+    return;
+}
+
+let u = {
+name: nameVal,
+phone: phoneVal,
+id: idVal
+};
+
+localStorage.setItem("currentCustomer", JSON.stringify(u));
+
+let customers = JSON.parse(localStorage.getItem("customers")) || [];
+customers.push(u);
+localStorage.setItem("customers", JSON.stringify(customers));
+
+openPanel();
+}
+
+/* فتح اللوحة */
+function openPanel(){
+loginBox.classList.add("hidden");
+panel.classList.remove("hidden");
+}
+
+/* الغرف */
+function goRooms(){
+window.location = "rooms.html";
+}
+
+/* الحجوزات */
+function showBookings(){
+
+let u = JSON.parse(localStorage.getItem("currentCustomer"));
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+let my = bookings.filter(b => b.customer == u.name);
+
+output.classList.remove("hidden");
+
+output.innerHTML = my.length ?
+my.map(b => `
+<div class="box">
+غرفة: ${b.room}<br>
+السعر: ${b.price}<br>
+التاريخ: ${b.date || "بدون تاريخ"}
+</div>
+`).join("")
+:
+"لا يوجد حجوزات";
+}
+
+/* الفاتورة */
+function showInvoice(){
+
+let u = JSON.parse(localStorage.getItem("currentCustomer"));
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+let my = bookings.filter(b => b.customer == u.name);
+
+let total = my.reduce((sum,b)=>sum + Number(b.price || 0),0);
+
+output.classList.remove("hidden");
+
+output.innerHTML = `
+<div class="box">
+عدد الحجوزات: ${my.length}<br>
+إجمالي الفاتورة: <b>${total}</b>
+</div>
+`;
+}
+
+/* خروج */
+function logout(){
+localStorage.removeItem("currentCustomer");
+location.reload();
+}
+
+</script>
+
+</body>
+</html>

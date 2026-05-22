@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>فندق الخليدي - تسجيل الدخول</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: Arial;
+            overflow: hidden;
+
+            background: url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb") no-repeat center center/cover;
+        }
+
+        /* زر الرجوع */
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: auto;
+            background: #60a5fa;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        /* اسم الطالب */
+        .student-name {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: beige;
+            color: rgb(26, 2, 2);
+            padding: 10px 18px;
+            border-radius: 80px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        /* التغبيش */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        /* صندوق تسجيل الدخول */
+        .box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            width: 380px;
+            padding: 35px;
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+
+            text-align: center;
+        }
+
+        h1 {
+            color: #d4af37;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        input,
+        select {
+            width: 92%;
+            padding: 12px;
+            margin: 10px 0;
+
+            border: none;
+            border-radius: 10px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+        }
+
+        button {
+            width: 90%;
+            padding: 13px;
+
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        #msg {
+            color: #ff4d4d;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- زر الرجوع -->
+    <button class="back-btn" onclick="goBack()">
+        رجوع
+    </button>
+
+    <!-- اسم الطالب -->
+    <div class="student-name">ENG: Abdulrhman Ali</div>
+
+    <!-- التغبيش -->
+    <div class="overlay"></div>
+
+    <!-- تسجيل الدخول -->
+    <div class="box">
+
+        <h1>AL-KHALIDI HOTEL</h1>
+        <h2> Login System</h2>
+
+        <input id="name"  type="text" placeholder="اسم المستخدم">
+
+        <input id="password" type="password" placeholder="كلمة المرور">
+
+        <select id="role">
+            <option value="customer">customer</option>
+            <option value="employee">employee</option>
+            <option value="admin">Admin</option>
+        </select>
+
+        <button onclick="login()">Enter</button>
+
+        <p id="msg"></p>
+
+    </div>
+
+    <script>
+
+        function login() {
+
+            var role = document.getElementById("role").value;
+            var name = document.getElementById("name").value;
+            var password = document.getElementById("password").value;
+
+            if (name == "" || password == "") {
+                document.getElementById("msg").innerHTML = "Please fill all fields";
+                return;
+            }
+
+            if (role === "admin" && name === "admin" && password === "1234") {
+                window.location = "admin.html";
+            }
+            else if (role === "employee" && name === "employee" && password === "1111") {
+                window.location = "employee.html";
+            }
+            else if (role === "customer") {
+                window.location = "customer.html";
+            }
+            else {
+                document.getElementById("msg").innerHTML = " Invalid login";
+            }
+        }
+
+        /* زر الرجوع */
+        function goBack() {
+            if (document.referrer && document.referrer !== "") {
+                window.location.href = document.referrer;
+            } else {
+                window.location.href = "index.html"; // عدلها لو عندك صفحة ثانية
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

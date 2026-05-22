@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة المدير - فندق الخليدي</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    margin:0;
+    background: url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb")
+    no-repeat center center/cover;
+    color:#111;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(255,255,255,0.75);
+    z-index:-1;
+}
+
+header{
+    background: linear-gradient(90deg,#111827,#1f2937);
+    color:white;
+    padding:16px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logout{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.container{display:flex}
+
+.sidebar{
+    width:230px;
+    background:#0f172a;
+    min-height:100vh;
+    padding:12px;
+}
+
+.sidebar button{
+    width:100%;
+    margin:6px 0;
+    padding:11px;
+    background:#1f2937;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.content{flex:1; padding:20px}
+
+.page{display:none}
+.active{display:block}
+
+.card{
+    background:white;
+    padding:18px;
+    border-radius:14px;
+    margin-bottom:15px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border-radius:8px;
+    border:1px solid #ddd;
+}
+
+.add{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* الغرف */
+.rooms{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:15px;
+}
+
+.room{
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,0.1);
+}
+
+.room img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+.room-body{
+    padding:12px;
+}
+
+.warn{background:#f59e0b;color:white;border:none;padding:5px;border-radius:5px;margin:3px}
+.edit{background:#10b981;color:white;border:none;padding:5px;border-radius:5px;margin:3px}
+.danger{background:#ef4444;color:white;border:none;padding:5px;border-radius:5px;margin:3px}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+td,th{
+    border:1px solid #eee;
+    padding:10px;
+    text-align:center;
+}
+
+.report{
+    background:#1f2937;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>فندق الخليدي - لوحة المدير</h2>
+<button class="logout" onclick="logout()">خروج</button>
+</header>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="show('rooms')">الغرف</button>
+<button onclick="window.location.href='booking.html'">الحجوزات</button>
+<button onclick="show('customers')">العملاء</button>
+<button onclick="show('employees')">الموظفين</button>
+<button onclick="show('report')">التقارير</button>
+</div>
+
+<div class="content">
+
+<!-- الغرف -->
+<div id="rooms" class="page active">
+<div class="card">
+<h3>إضافة غرفة</h3>
+<input id="rnum" placeholder="رقم الغرفة">
+<input id="rtype" placeholder="نوع الغرفة">
+<input id="rprice" placeholder="السعر">
+<input type="file" id="rimg">
+<button class="add" onclick="addRoom()">إضافة</button>
+</div>
+
+<div class="card">
+<div class="rooms" id="roomList"></div>
+</div>
+</div>
+
+<!-- العملاء -->
+<div id="customers" class="page">
+<div class="card">
+<h3>العملاء / الحجوزات</h3>
+<table>
+<tr>
+<th>العميل</th>
+<th>الغرفة</th>
+<th>التاريخ</th>
+<th>إلغاء</th>
+</tr>
+<tbody id="custTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- الموظفين -->
+<div id="employees" class="page">
+<div class="card">
+<h3>إضافة موظف</h3>
+<input id="empName">
+<input id="empSalary">
+<input id="empAddress">
+<input id="empPass">
+<button class="add" onclick="addEmp()">إضافة</button>
+</div>
+
+<div class="card">
+<table>
+<tr><th>الاسم</th><th>راتب</th><th>عنوان</th><th>حذف</th></tr>
+<tbody id="empTable"></tbody>
+</table>
+</div>
+</div>
+
+<!-- التقرير -->
+<div id="report" class="page">
+<div class="card report">
+<h3>تقرير يومي</h3>
+<p>إجمالي الحجوزات: <span id="allCount"></span></p>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+let employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+function show(id){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+render();
+}
+
+/* إضافة غرفة */
+function addRoom(){
+let file = rimg.files[0];
+let reader = new FileReader();
+
+reader.onload = function(){
+rooms.push({
+id:Date.now(),
+number:rnum.value,
+type:rtype.value,
+price:rprice.value,
+img:reader.result,
+status:"متاحة"
+});
+save();
+};
+
+if(file) reader.readAsDataURL(file);
+}
+
+/* عرض الغرف */
+function renderRooms(){
+roomList.innerHTML="";
+
+rooms.forEach((r,i)=>{
+roomList.innerHTML += `
+<div class="room">
+<img src="${r.img}">
+<div class="room-body">
+<h3>غرفة ${r.number}</h3>
+<p>${r.type}</p>
+<p>${r.price} $</p>
+<p><b>${r.status}</b></p>
+
+<button class="warn" onclick="toggleMaintenance(${i})">صيانة</button>
+<button class="edit" onclick="editRoom(${i})">تعديل</button>
+<button class="danger" onclick="deleteRoom(${i})">حذف</button>
+</div>
+</div>
+`;
+});
+}
+
+/* موظف */
+function addEmp(){
+employees.push({
+name:empName.value,
+salary:empSalary.value,
+address:empAddress.value,
+pass:empPass.value
+});
+save();
+}
+
+/* حفظ */
+function save(){
+localStorage.setItem("rooms",JSON.stringify(rooms));
+localStorage.setItem("bookings",JSON.stringify(bookings));
+localStorage.setItem("employees",JSON.stringify(employees));
+render();
+}
+
+/* عرض */
+function render(){
+
+renderRooms();
+
+/* العملاء */
+custTable.innerHTML="";
+bookings.forEach(b=>{
+custTable.innerHTML+=`
+<tr>
+<td>${b.customer}</td>
+<td>${b.room}</td>
+<td>${b.date}</td>
+<td><button onclick="cancelBooking(${b.id})">إلغاء</button></td>
+</tr>`;
+});
+
+/* الموظفين */
+empTable.innerHTML="";
+employees.forEach((e,i)=>{
+empTable.innerHTML+=`
+<tr>
+<td>${e.name}</td>
+<td>${e.salary}</td>
+<td>${e.address}</td>
+<td><button onclick="employees.splice(${i},1);save()">حذف</button></td>
+</tr>`;
+});
+
+allCount.innerText = bookings.length;
+}
+
+/* حجز */
+function bookRoom(i){
+if(rooms[i].status !== "متاحة") return;
+
+rooms[i].status="محجوزة";
+
+bookings.push({
+id:Date.now(),
+customer:"عميل",
+room:rooms[i].number,
+date:new Date().toLocaleString()
+});
+
+save();
+}
+
+/* إلغاء */
+function cancelBooking(id){
+let b = bookings.find(x => x.id === id);
+
+if(b){
+let room = rooms.find(r => r.number == b.room);
+if(room) room.status = "متاحة";
+}
+
+bookings = bookings.filter(x => x.id !== id);
+save();
+}
+
+/* صيانة */
+function toggleMaintenance(i){
+rooms[i].status = rooms[i].status === "صيانة" ? "متاحة" : "صيانة";
+save();
+}
+
+/* تعديل */
+function editRoom(i){
+let n = prompt("رقم الغرفة", rooms[i].number);
+let t = prompt("نوع الغرفة", rooms[i].type);
+let p = prompt("السعر", rooms[i].price);
+
+if(n) rooms[i].number=n;
+if(t) rooms[i].type=t;
+if(p) rooms[i].price=p;
+
+save();
+}
+
+/* حذف */
+function deleteRoom(i){
+rooms.splice(i,1);
+save();
+}
+
+function logout(){
+localStorage.removeItem("user");
+window.location.href="login.html";
+}
+
+render();
+
+</script>
+
+</body>
+</html>

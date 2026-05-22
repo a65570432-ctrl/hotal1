@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لوحة الموظف - فندق الخليدي</title>
+
+<style>
+
+/* ===== خلفية عامة ===== */
+body{
+    margin:0;
+    font-family:Arial;
+    background:url("https://images.unsplash.com/photo-1520250497591-112f2f40a3f4") no-repeat center center/cover;
+}
+
+/* طبقة شفافة فوق الخلفية */
+body::before{
+    content:"";
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.55);
+    z-index:-1;
+}
+
+/* ===== الهيدر ===== */
+header{
+    background:#0f172a;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+/* ===== layout ===== */
+.container{
+    display:flex;
+}
+
+.sidebar{
+    width:220px;
+    background:rgba(30,41,59,0.9);
+    min-height:100vh;
+    padding:15px;
+}
+
+.sidebar button{
+    width:100%;
+    padding:12px;
+    margin:5px 0;
+    border:none;
+    border-radius:8px;
+    background:#334155;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.sidebar button:hover{
+    background:#475569;
+}
+
+/* زر الرجوع */
+.back-btn{
+    background:#dc2626 !important;
+}
+
+.back-btn:hover{
+    background:#b91c1c !important;
+}
+
+.content{
+    flex:1;
+    padding:20px;
+}
+
+.page{
+    display:none;
+}
+
+.active{
+    display:block;
+}
+
+/* ===== cards ===== */
+.card{
+    background:rgba(255,255,255,0.95);
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* ===== inputs ===== */
+input{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border:1px solid #ddd;
+    border-radius:6px;
+    box-sizing:border-box;
+}
+
+/* ===== buttons ===== */
+button{
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.book{
+    background:blue;
+    color:white;
+    width:100%;
+    margin-top:10px;
+}
+
+/* ===== table ===== */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    background:white;
+}
+
+td,th{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+/* ===== رسالة ===== */
+#msg{
+    color:red;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>فندق الخليدي</h1>
+<h2>لوحة الموظف</h2>
+</header>
+
+<div class="container">
+
+<!-- ===== القائمة ===== -->
+<div class="sidebar">
+
+<button onclick="show('dashboard')">الرئيسية</button>
+
+<button onclick="show('booking')">حجز غرفة</button>
+
+<button onclick="show('customers')">العملاء</button>
+
+<button onclick="goRooms()">الغرف</button>
+
+<button onclick="goBookings()">الحجوزات</button>
+
+<!-- 🔥 زر الرجوع -->
+<button class="back-btn" onclick="goBack()">
+⬅ رجوع
+</button>
+
+</div>
+
+<!-- ===== المحتوى ===== -->
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page active">
+
+<div class="card">
+<h3>الإحصائيات</h3>
+
+<p>الغرف: <span id="roomCount">0</span></p>
+
+<p>متاحة: <span id="availCount">0</span></p>
+
+<p>محجوزة: <span id="bookCount">0</span></p>
+
+<p>الحجوزات: <span id="resCount">0</span></p>
+
+</div>
+
+</div>
+
+<!-- BOOKING -->
+<div id="booking" class="page">
+
+<div class="card">
+
+<h3>حجز غرفة (بيانات العميل)</h3>
+
+<input id="name" placeholder="اسم العميل">
+
+<input id="phone" placeholder="الهاتف">
+
+<input id="idCard" placeholder="الهوية">
+
+<button class="book" onclick="startBooking()">
+التالي ➜ الغرف
+</button>
+
+<p id="msg"></p>
+
+</div>
+
+</div>
+
+<!-- CUSTOMERS -->
+<div id="customers" class="page">
+
+<div class="card">
+
+<h3>العملاء المحجوزين</h3>
+
+<table>
+
+<tr>
+<th>الاسم</th>
+<th>الهاتف</th>
+<th>الهوية</th>
+<th>الغرفة</th>
+</tr>
+
+<tbody id="customersTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+let customers =
+JSON.parse(localStorage.getItem("customers")) || [];
+
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || [];
+
+let rooms =
+JSON.parse(localStorage.getItem("rooms")) || [];
+
+/* ===== التنقل ===== */
+function show(id){
+
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
+
+document
+.getElementById(id)
+.classList.add("active");
+
+if(id === "customers"){
+loadCustomers();
+}
+
+if(id === "dashboard"){
+updateStats();
+}
+
+}
+
+/* ===== بدء الحجز ===== */
+function startBooking(){
+
+let name =
+document.getElementById("name").value;
+
+let phone =
+document.getElementById("phone").value;
+
+let idCard =
+document.getElementById("idCard").value;
+
+let msg =
+document.getElementById("msg");
+
+if(name=="" || phone=="" || idCard==""){
+
+msg.innerText = "كمل بيانات العميل";
+
+return;
+}
+
+/* حفظ مؤقت */
+localStorage.setItem(
+"tempCustomer",
+
+JSON.stringify({
+name,
+phone,
+idCard
+})
+
+);
+
+/* الذهاب للغرف */
+window.location.href = "rooms.html";
+
+}
+
+/* ===== عرض العملاء ===== */
+function loadCustomers(){
+
+customers =
+JSON.parse(localStorage.getItem("customers")) || [];
+
+customersTable.innerHTML = "";
+
+customers.forEach(c=>{
+
+customersTable.innerHTML += `
+
+<tr>
+
+<td>${c.name}</td>
+
+<td>${c.phone}</td>
+
+<td>${c.id}</td>
+
+<td>${c.room || "-"}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+/* ===== فتح الصفحات ===== */
+function goRooms(){
+
+window.location.href = "rooms.html";
+
+}
+
+function goBookings(){
+
+window.location.href = "booking.html";
+
+}
+
+/* ===== زر الرجوع ===== */
+function goBack(){
+
+history.back();
+
+}
+
+/* ===== تحديث الإحصائيات ===== */
+function updateStats(){
+
+rooms =
+JSON.parse(localStorage.getItem("rooms")) || [];
+
+bookings =
+JSON.parse(localStorage.getItem("bookings")) || [];
+
+document.getElementById("roomCount").innerText =
+rooms.length;
+
+document.getElementById("availCount").innerText =
+rooms.filter(r=>r.status==="متاحة").length;
+
+document.getElementById("bookCount").innerText =
+rooms.filter(r=>r.status!=="متاحة").length;
+
+document.getElementById("resCount").innerText =
+bookings.length;
+
+}
+
+updateStats();
+
+</script>
+
+</body>
+</html>

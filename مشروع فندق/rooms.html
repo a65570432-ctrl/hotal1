@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<title>الغرف - فندق الخليدي</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    background: linear-gradient(135deg,#0f172a,#1e293b);
+    margin:0;
+    padding:20px;
+    color:#fff;
+}
+
+header{
+    background: rgba(255,255,255,0.08);
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-radius:12px;
+}
+
+.back-btn{
+    background:#334155;
+    color:#fff;
+    border:none;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.stats{
+    display:flex;
+    justify-content:space-around;
+    margin-top:15px;
+    background:rgba(255,255,255,0.08);
+    padding:15px;
+    border-radius:12px;
+}
+
+.filter{
+    margin:15px 0;
+    text-align:center;
+}
+
+.filter button{
+    padding:10px 15px;
+    margin:5px;
+    border:none;
+    border-radius:8px;
+    background:#334155;
+    color:#fff;
+    cursor:pointer;
+}
+
+.filter button.active{
+    background:#2563eb;
+}
+
+.rooms{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:15px;
+}
+
+.room{
+    background:rgba(255,255,255,0.08);
+    border-radius:15px;
+    padding:10px;
+}
+
+.status{font-weight:bold;}
+.available{color:#22c55e;}
+.booked{color:#ef4444;}
+.maintenance{color:#f59e0b;}
+
+button.action{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    margin-top:8px;
+    cursor:pointer;
+}
+
+.book{
+    background:#2563eb;
+    color:#fff;
+}
+
+.cancel{
+    background:#f97316;
+    color:#fff;
+}
+
+button:disabled{
+    background:#555;
+    cursor:not-allowed;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<button class="back-btn" onclick="history.back()">➜ رجوع</button>
+<h2>فندق الخليدي - الغرف</h2>
+</header>
+
+<div class="stats">
+<div>إجمالي: <span id="totalRooms">0</span></div>
+<div>متاحة: <span id="availableRooms">0</span></div>
+<div>محجوزة: <span id="bookedRooms">0</span></div>
+</div>
+
+<div class="filter">
+<button onclick="filterRooms('all')" class="active">الكل</button>
+<button onclick="filterRooms('عادية')">عادية</button>
+<button onclick="filterRooms('مزدوجة')">مزدوجة</button>
+<button onclick="filterRooms('جناح')">جناح</button>
+</div>
+
+<div id="container" class="rooms"></div>
+
+<script>
+
+let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
+let currentFilter = "all";
+
+/* عرض */
+function renderRooms(){
+
+let container = document.getElementById("container");
+container.innerHTML = "";
+
+let filtered = rooms.filter(r =>
+currentFilter === "all" || r.type === currentFilter
+);
+
+filtered.forEach(r=>{
+
+let statusClass =
+r.status === "متاحة" ? "available" :
+r.status === "صيانة" ? "maintenance" :
+"booked";
+
+container.innerHTML += `
+<div class="room">
+
+<h3>غرفة ${r.number}</h3>
+<p>النوع: ${r.type}</p>
+<p>السعر: ${r.price}</p>
+
+<p class="status ${statusClass}">
+${r.status}
+</p>
+
+<button class="action book"
+onclick="bookRoom(${r.id})"
+${r.status!=="متاحة" ? "disabled" : ""}>
+حجز
+</button>
+
+<button class="action cancel"
+onclick="cancelRoom(${r.id})"
+${r.status!=="محجوزة" ? "disabled" : ""}>
+إلغاء
+</button>
+
+</div>
+`;
+});
+
+updateStats();
+}
+
+/* حجز */
+function bookRoom(id){
+
+let user = JSON.parse(localStorage.getItem("currentCustomer"));
+if(!user){
+alert("سجل دخول أولاً");
+return;
+}
+
+let room = rooms.find(r=>r.id===id);
+
+if(!room) return;
+if(room.status !== "متاحة") return;
+
+room.status = "محجوزة";
+
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+bookings.push({
+customer: user.name,
+room: room.number,
+price: room.price,
+date: new Date().toLocaleString()
+});
+
+localStorage.setItem("rooms", JSON.stringify(rooms));
+localStorage.setItem("bookings", JSON.stringify(bookings));
+
+renderRooms();
+}
+
+/* إلغاء */
+function cancelRoom(id){
+
+let room = rooms.find(r=>r.id===id);
+if(!room) return;
+
+room.status = "متاحة";
+
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+bookings = bookings.filter(b => b.room !== room.number);
+
+localStorage.setItem("rooms", JSON.stringify(rooms));
+localStorage.setItem("bookings", JSON.stringify(bookings));
+
+renderRooms();
+}
+
+/* فلترة */
+function filterRooms(type){
+
+currentFilter = type;
+
+document.querySelectorAll(".filter button")
+.forEach(b=>b.classList.remove("active"));
+
+event.target.classList.add("active");
+
+renderRooms();
+}
+
+/* إحصائيات */
+function updateStats(){
+document.getElementById("totalRooms").innerText = rooms.length;
+document.getElementById("availableRooms").innerText =
+rooms.filter(r=>r.status==="متاحة").length;
+document.getElementById("bookedRooms").innerText =
+rooms.filter(r=>r.status==="محجوزة").length;
+}
+
+renderRooms();
+
+</script>
+
+</body>
+</html>
