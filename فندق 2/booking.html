@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>الحجوزات - فندق الخليدي</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Tahoma,sans-serif;
+}
+
+body{
+min-height:100vh;
+padding:25px;
+color:#fff;
+background:
+linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+url("https://images.unsplash.com/photo-1566073771259-6a8506099945")
+center/cover fixed;
+}
+
+.header{
+text-align:center;
+margin-bottom:35px;
+}
+
+.header h2{
+font-size:38px;
+font-weight:700;
+margin-bottom:20px;
+text-shadow:0 4px 15px rgba(0,0,0,.5);
+}
+
+/* 
+   الأزرار */
+
+.top-buttons{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+}
+
+button{
+padding:12px 22px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:15px;
+font-weight:600;
+color:white;
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+transition:.35s;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+button:hover{
+transform:translateY(-4px);
+box-shadow:0 15px 30px rgba(37,99,235,.45);
+}
+
+/* 
+   الحاوية */
+
+.container{
+max-width:1100px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+gap:25px;
+}
+
+/* 
+   بطاقة الحجز
+ */
+
+.booking{
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.15);
+border-radius:24px;
+padding:22px;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
+transition:.4s;
+position:relative;
+overflow:hidden;
+}
+
+.booking:hover{
+transform:translateY(-8px);
+box-shadow:0 20px 40px rgba(0,0,0,.4);
+}
+
+/* 
+   صفوف البيانات
+ */
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 0;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+strong{
+color:#60a5fa;
+font-size:15px;
+}
+
+.row span{
+font-size:15px;
+}
+
+/* 
+   النوع الا يضيف 
+ */
+
+.badge{
+padding:7px 14px;
+border-radius:30px;
+font-size:12px;
+font-weight:bold;
+}
+
+.user{
+background:linear-gradient(135deg,#22c55e,#16a34a);
+}
+
+.staff{
+background:linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+/* 
+   زر الإلغاء */
+
+.cancel{
+margin-top:15px;
+width:100%;
+background:linear-gradient(135deg,#ef4444,#dc2626);
+font-weight:bold;
+}
+
+.cancel:hover{
+box-shadow:0 15px 30px rgba(239,68,68,.4);
+}
+
+/* 
+   لا توجد حجوزات */
+
+.empty{
+padding:35px;
+text-align:center;
+font-size:20px;
+border-radius:20px;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(15px);
+grid-column:1/-1;
+}
+
+
+
+@media(max-width:700px){
+
+.container{
+grid-template-columns:1fr;
+}
+
+.row{
+flex-direction:column;
+align-items:flex-start;
+gap:8px;
+}
+
+button{
+width:100%;
+}
+
+.header h2{
+font-size:28px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>فندق الخليدي - الحجوزات</h2>
+
+<div class="top-buttons">
+<button onclick="load()">تحديث</button>
+<button onclick="history.back()">رجوع</button>
+</div>
+</div>
+
+<div class="container" id="list"></div>
+
+<script>
+
+/* تحميل البيانات */
+function load(){
+
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+let all = [
+...requests.map((x,i)=>({
+id:i,
+source:"request",
+name:x.name,
+room:x.room,
+price:x.price||"غير محدد",
+date:x.date||"بدون تاريخ",
+status:x.status||"قيد الانتظار",
+type:"زبون"
+})),
+
+...bookings.map((x,i)=>({
+id:i,
+source:"booking",
+name:x.customer||x.name,
+room:x.room,
+price:x.price||"غير محدد",
+date:x.date||"بدون تاريخ",
+status:x.status||"مؤكد",
+type:x.customer?"زبون":"موظف"
+}))
+];
+
+if(all.length===0){
+list.innerHTML=`<div class="empty">لا توجد حجوزات</div>`;
+return;
+}
+
+list.innerHTML = all.map(x=>`
+<div class="booking">
+
+<div class="row"><strong>الاسم</strong><span>${x.name}</span></div>
+<div class="row"><strong>الغرفة</strong><span>${x.room}</span></div>
+<div class="row"><strong>السعر</strong><span>${x.price}</span></div>
+<div class="row"><strong>التاريخ</strong><span>${x.date}</span></div>
+<div class="row">
+<strong>النوع</strong>
+<span class="badge ${x.type=="زبون"?"user":"staff"}">${x.type}</span>
+</div>
+<div class="row"><strong>الحالة</strong><span>${x.status}</span></div>
+
+<button class="cancel" onclick="cancel('${x.source}',${x.id})">إلغاء الحجز</button>
+
+</div>
+`).join("");
+
+}
+
+/* حذف */
+function cancel(type,id){
+
+let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
+let requests = JSON.parse(localStorage.getItem("requests")) || [];
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+if(type==="request"){
+let room = requests[id].room;
+requests.splice(id,1);
+let r = rooms.find(r=>r.number==room);
+if(r) r.status="متاحة";
+}
+
+if(type==="booking"){
+let room = bookings[id].room;
+bookings.splice(id,1);
+let r = rooms.find(r=>r.number==room);
+if(r) r.status="متاحة";
+}
+
+localStorage.setItem("requests",JSON.stringify(requests));
+localStorage.setItem("bookings",JSON.stringify(bookings));
+localStorage.setItem("rooms",JSON.stringify(rooms));
+
+load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

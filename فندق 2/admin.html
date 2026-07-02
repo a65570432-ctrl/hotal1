@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>لوحة المدير - فندق الخليدي</title>
+
+<style>
+    
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI', Tahoma, sans-serif;
+}
+
+/* خلفية البدي نفسة   ثبات */
+body{
+min-height:100vh;
+background:url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb")
+no-repeat center center/cover;
+position:relative;
+color:#fff;
+}
+
+/* طبقة زجاجية */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+backdrop-filter: blur(2px);
+z-index:-1;
+transition:0.4s;
+}
+
+/* ليلي */
+body.dark::before{
+background:rgba(0,0,0,.65);
+}
+
+/* نهاري */
+body.light::before{
+background:rgba(255,255,255,.25);
+}
+
+/* الهيدر */
+header{
+background:rgba(15, 23, 42, .85);
+backdrop-filter: blur(10px);
+color:#fff;
+padding:16px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 8px 25px rgba(0,0,0,.25);
+position:sticky;
+top:0;
+z-index:10;
+}
+
+/* زر الخروج */
+.logout{
+background:linear-gradient(135deg,#ef4444,#dc2626);
+color:#fff;
+border:none;
+padding:10px 16px;
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
+}
+.logout:hover{
+transform:scale(1.05);
+}
+
+/* layout */
+.container{display:flex;}
+
+/* sidebar */
+.sidebar{
+width:260px;
+background:rgba(2, 6, 23, .85);
+backdrop-filter: blur(10px);
+min-height:100vh;
+padding:15px;
+border-left:1px solid rgba(255,255,255,.05);
+}
+
+/* زر الرئيسية */
+.main-btn{
+width:100%;
+padding:12px;
+background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+color:#fff;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+margin-bottom:10px;
+transition:0.3s;
+}
+.main-btn:hover{
+transform:scale(1.03);
+}
+
+/* القائمة */
+#menuBox{display:none;}
+
+#menuBox button{
+width:100%;
+margin:6px 0;
+padding:12px;
+background:rgba(255,255,255,.05);
+color:#fff;
+border:1px solid rgba(255,255,255,.08);
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
+}
+#menuBox button:hover{
+background:rgba(255,255,255,.12);
+transform:translateX(-3px);
+}
+
+/* المحتوى */
+.content{
+flex:1;
+padding:20px;
+}
+
+/* الصفحات */
+.page{display:none;}
+.page.active{display:block;}
+
+/* كارد */
+.card{
+background:rgba(255,255,255,.92);
+color:#111;
+padding:18px;
+border-radius:16px;
+margin-bottom:15px;
+box-shadow:0 10px 30px rgba(0,0,0,.2);
+backdrop-filter: blur(10px);
+transition:0.3s;
+}
+.card:hover{
+transform:translateY(-3px);
+}
+
+/* inputs */
+input{
+width:100%;
+padding:12px;
+margin:6px 0;
+border:1px solid #ddd;
+border-radius:10px;
+outline:none;
+transition:0.2s;
+}
+input:focus{
+border-color:#3b82f6;
+box-shadow:0 0 8px rgba(59,130,246,.3);
+}
+
+/* زر إضافة */
+.add{
+width:100%;
+background:linear-gradient(135deg,#22c55e,#16a34a);
+color:#fff;
+border:none;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
+}
+.add:hover{
+transform:scale(1.02);
+}
+
+/* الغرف */
+.rooms{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:15px;
+}
+
+.room{
+background:rgba(255,255,255,.95);
+border-radius:14px;
+padding:14px;
+box-shadow:0 8px 25px rgba(0,0,0,.15);
+transition:0.3s;
+color:#111;
+}
+.room:hover{
+transform:translateY(-5px);
+}
+
+.room img{
+width:100%;
+height:160px;
+object-fit:cover;
+border-radius:12px;
+margin-bottom:10px;
+}
+
+/* أزرار الغرف */
+.warn,.edit,.danger{
+border:none;
+padding:8px 10px;
+border-radius:8px;
+color:#fff;
+cursor:pointer;
+margin-top:5px;
+transition:0.3s;
+}
+
+.warn{background:#f59e0b;}
+.edit{background:#10b981;}
+.danger{background:#ef4444;}
+
+.warn:hover,.edit:hover,.danger:hover{
+transform:scale(1.05);
+}
+
+/* الجداول */
+table{
+width:100%;
+border-collapse:collapse;
+background:#fff;
+border-radius:10px;
+overflow:hidden;
+}
+
+td,th{
+border:1px solid #eee;
+padding:10px;
+text-align:center;
+color:#111;
+}
+.table-wrap{
+overflow-x:auto;
+}
+/* الوضع الليلي */
+body.light{
+color:#111;
+}
+
+body.light .card{
+background:rgba(255,255,255,.95);
+}
+
+body.light .sidebar{
+background:rgba(255,255,255,.6);
+color:#111;
+}
+
+body.light #menuBox button{
+color:#111;
+background:rgba(0,0,0,.05);
+}
+
+body.light header{
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+}
+
+/* ===== سويتش الوضع ===== */
+.switch {
+position: relative;
+display: inline-block;
+width: 55px;
+height: 28px;
+}
+
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: rgba(255,255,255,.25);
+transition: .4s;
+border-radius: 34px;
+border:1px solid rgba(255,255,255,.3);
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 20px;
+width: 20px;
+left: 4px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+
+/* عند التفعيل */
+input:checked + .slider {
+background: linear-gradient(135deg,#facc15,#3b82f6);
+}
+
+input:checked + .slider:before {
+transform: translateX(26px);
+}
+/* ===== التابلت ===== */
+@media (max-width: 900px){
+
+.container{
+flex-direction:column;
+}
+
+.sidebar{
+width:100%;
+min-height:auto;
+}
+
+.content{
+padding:15px;
+}
+
+header h2{
+font-size:22px;
+}
+
+}
+
+/* ===== الجوال ===== */
+@media (max-width: 600px){
+
+header{
+flex-direction:column;
+gap:12px;
+text-align:center;
+padding:15px;
+}
+
+header h2{
+font-size:18px;
+line-height:1.6;
+}
+
+.content{
+padding:10px;
+}
+
+.card{
+padding:15px;
+border-radius:12px;
+}
+
+.rooms{
+grid-template-columns:1fr;
+}
+
+.room img{
+height:180px;
+}
+
+table{
+font-size:13px;
+}
+
+td,th{
+padding:8px;
+}
+
+.sidebar{
+padding:10px;
+}
+
+.main-btn,
+#menuBox button,
+.add,
+.logout{
+font-size:14px;
+padding:10px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>فندق الخليدي - لوحة المدير</h2>
+
+<div style="display:flex;gap:10px;align-items:center;">
+<label class="switch">
+  <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
+  <span class="slider"></span>
+</label>
+
+<button class="logout" onclick="logout()">خروج</button>
+
+</div>
+
+</header>
+<div class="container">
+
+<div class="sidebar">
+
+<button class="main-btn" onclick="toggleMenu()">
+☰ الرئيسية
+</button>
+
+<div id="menuBox">
+
+<button onclick="show('dashboard')">لوحة التحكم</button>
+<button onclick="show('rooms')">إدارة الغرف</button>
+<button onclick="show('customers')">العملاء</button>
+<button onclick="show('employees')">الموظفين</button>
+<button onclick="show('report')">التقارير</button>
+
+<button onclick="goRooms()">الغرف</button>
+<button onclick="goBookings()">الحجوزات</button>
+
+</div>
+
+</div>
+
+<!--المحتوى-->
+<div class="content">
+
+<!--الصفحة الجانبي-->
+
+<div id="dashboard" class="page active">
+<div class="card">
+<h3>لوحة التحكم</h3>
+<p>عدد الغرف: <span id="dashRooms">0</span></p>
+<p>عدد الحجوزات: <span id="dashBookings">0</span></p>
+<p>عدد الموظفين: <span id="dashEmployees">0</span></p>
+</div>
+</div>
+
+<!-- الغرف -->
+<div id="rooms" class="page">
+
+<div class="card">
+<h3>إضافة غرفة</h3>
+
+<input id="rnum" placeholder="رقم الغرفة">
+<input id="rtype" placeholder="نوع الغرفة">
+<input id="rprice" placeholder="السعر">
+<input type="file" id="rimg" accept="image/*">
+
+<button class="add" onclick="addRoom()"> إضافة غرفة</button>
+
+</div>
+<!--عرض الغرف الا اضيفهم باادارة الغرف-->
+<div class="card">
+<div class="rooms" id="roomList"></div>
+</div>
+
+</div>
+
+<!-- CUSTOMERS -->
+<div id="customers" class="page">
+
+<div class="card">
+
+<div class="table-wrap">
+
+
+<table>
+
+<tr>
+<th>العميل</th>
+<th>الغرفة</th>
+<th>التاريخ</th>
+<th>إلغاء</th>
+</tr>
+<tbody id="custTable"></tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<!-- EMPLOYEES -->
+<div id="employees" class="page">
+
+<div class="card">
+
+<input id="empName" placeholder="اسم الموظف">
+<input id="empSalary" placeholder="الراتب">
+<input id="empAddress" placeholder="العنوان">
+
+<button class="add" onclick="addEmp()"> إضافة موظف</button>
+
+</div>
+
+<div class="card">
+<div class="table-wrap">
+
+<table>
+
+<tr>
+<th>الاسم</th>
+<th>الراتب</th>
+<th>العنوان</th>
+<th>حذف</th>
+</tr>
+
+<tbody id="empTable"></tbody>
+
+</table>
+</div>
+</div>
+
+</div>
+
+<!-- التقارير -->
+<div id="report" class="page">
+
+<div class="card">
+
+<h3>التقارير</h3>
+
+<p>
+إجمالي الحجوزات:
+<span id="allCount">0</span>
+</p>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+let rooms =
+JSON.parse(localStorage.getItem("rooms")) || [];
+
+let bookings =
+JSON.parse(localStorage.getItem("bookings")) || [];
+
+let employees =
+JSON.parse(localStorage.getItem("employees")) || [];
+
+/* فتح وإغلاق القائمة */
+function toggleMenu(){
+
+let menu =
+document.getElementById("menuBox");
+
+if(menu.style.display==="block"){
+menu.style.display="none";
+}else{
+menu.style.display="block";
+}
+
+}
+
+/* تغيير الصفحات */
+function show(id){
+
+document
+.querySelectorAll(".page")
+.forEach(page=>{
+page.classList.remove("active");
+});
+
+document
+.getElementById(id)
+.classList.add("active");
+
+render();
+
+}
+//اضاف الغرف
+function addRoom(){
+
+if(!rnum.value || !rtype.value || !rprice.value){
+alert("أدخل البيانات");
+return;
+}
+
+let file = rimg.files[0];
+
+if(file){
+
+let reader = new FileReader();
+
+reader.onload = function(e){
+
+rooms.push({
+id: Date.now(),
+number: rnum.value,
+type: rtype.value,
+price: rprice.value,
+image: e.target.result, //اضافة الصورة بس رفع ملف من الجهاز
+status: "متاحة"
+});
+
+save();
+
+rnum.value="";
+rtype.value="";
+rprice.value="";
+rimg.value="";
+
+};
+/* الصور اذي عملية التحويل*/
+reader.readAsDataURL(file);
+
+}else{
+
+rooms.push({
+id: Date.now(),
+number: rnum.value,
+type: rtype.value,
+price: rprice.value,
+image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+status: "متاحة"
+});
+
+save();
+
+rnum.value="";
+rtype.value="";
+rprice.value="";
+
+}
+}
+
+/* عرض الغرف */
+function renderRooms(){
+
+roomList.innerHTML="";
+
+rooms.forEach((r,i)=>{
+
+roomList.innerHTML += `
+
+<div class="room">
+
+<img src="${r.image}">
+
+<h3>غرفة ${r.number}</h3>
+
+<p>النوع: ${r.type}</p>
+
+<p>السعر: ${r.price}</p>
+
+<p>الحالة: ${r.status}</p>
+
+<button class="warn"
+onclick="toggleMaintenance(${i})">
+صيانة
+</button>
+
+<button class="edit"
+onclick="editRoom(${i})">
+تعديل
+</button>
+
+<button class="danger"
+onclick="deleteRoom(${i})">
+حذف
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+/* إضافة موظف */
+function addEmp(){
+
+if(
+!empName.value ||
+!empSalary.value ||
+!empAddress.value
+){
+alert("أدخل البيانات");
+return;
+}
+
+employees.push({
+
+id:Date.now(),
+
+name:empName.value,
+
+salary:empSalary.value,
+
+address:empAddress.value
+
+});
+
+save();
+
+empName.value="";
+empSalary.value="";
+empAddress.value="";
+
+}
+
+/* حفظ */
+function save(){
+
+localStorage.setItem(
+"rooms",
+JSON.stringify(rooms)
+);
+
+localStorage.setItem(
+"bookings",
+JSON.stringify(bookings)
+);
+
+localStorage.setItem(
+"employees",
+JSON.stringify(employees)
+);
+
+render();
+
+}
+
+/* عرض البيانات */
+function render(){
+
+renderRooms();
+
+dashRooms.innerText =
+rooms.length;
+
+dashBookings.innerText =
+bookings.length;
+
+dashEmployees.innerText =
+employees.length;
+
+/* العملاء */
+custTable.innerHTML="";
+
+bookings.forEach(b=>{
+
+custTable.innerHTML += `
+
+<tr>
+
+<td>${b.customer}</td>
+
+<td>${b.room}</td>
+
+<td>${b.date}</td>
+
+<td>
+
+<button
+onclick="cancelBooking(${b.id})">
+إلغاء
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+/* الموظفين */
+empTable.innerHTML="";
+
+employees.forEach(e=>{
+
+empTable.innerHTML += `
+
+<tr>
+
+<td>${e.name}</td>
+
+<td>${e.salary}</td>
+
+<td>${e.address}</td>
+
+<td>
+
+<button
+onclick="deleteEmp(${e.id})">
+حذف
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+/* التقرير */
+allCount.innerText =
+bookings.length;
+
+}
+
+/* صيانة */
+function toggleMaintenance(i){
+
+rooms[i].status =
+rooms[i].status==="صيانة"
+?
+"متاحة"
+:
+"صيانة";
+
+save();
+
+}
+/*زر الاضاة*/
+function toggleTheme(){
+
+let sw = document.getElementById("themeSwitch");
+
+document.body.classList.toggle("light", sw.checked);
+
+if(sw.checked){
+localStorage.setItem("theme","light");
+}else{
+localStorage.setItem("theme","dark");
+}
+
+}
+
+/* تعديل غرفة */
+function editRoom(i){
+
+let r=rooms[i];
+
+let n=
+prompt("رقم الغرفة",r.number);
+
+let t=
+prompt("نوع الغرفة",r.type);
+
+let p=
+prompt("السعر",r.price);
+
+if(n) r.number=n;
+if(t) r.type=t;
+if(p) r.price=p;
+
+save();
+
+}
+
+/* حذف غرفة */
+function deleteRoom(i){
+
+rooms.splice(i,1);
+
+save();
+
+}
+
+/* حذف موظف */
+function deleteEmp(id){
+
+employees =
+employees.filter(
+e=>e.id!==id
+);
+
+save();
+
+}
+
+/* إلغاء حجز */
+function cancelBooking(id){
+
+bookings =
+bookings.filter(
+b=>b.id!==id
+);
+
+save();
+
+}
+
+/* انتقال للغرف */
+function goRooms(){
+location="rooms.html";
+}
+
+/* انتقال للحجوزات */
+function goBookings(){
+location="booking.html";
+}
+
+/* خروج */
+function logout(){
+
+localStorage.removeItem("user");
+
+location="login.html";
+}
+// تخزين للزر اليلي والنهاري
+let sw = document.getElementById("themeSwitch");
+
+if(localStorage.getItem("theme")==="light"){
+document.body.classList.add("light");
+if(sw) sw.checked = true;
+}
+
+render();
+
+</script>
+
+</body>
+</html>

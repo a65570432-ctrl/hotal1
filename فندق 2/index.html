@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>فندق الخليدي</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Tahoma,sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:
+linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+url("https://images.unsplash.com/photo-1566073771259-6a8506099945")
+center/cover fixed;
+color:white;
+}
+
+/* الحاوية */
+
+.container{
+width:100%;
+max-width:1000px;
+padding:30px;
+}
+
+/* العنوان */
+
+.header{
+text-align:center;
+margin-bottom:40px;
+}
+
+.header h1{
+font-size:60px;
+font-weight:700;
+letter-spacing:2px;
+text-shadow:0 8px 25px rgba(0,0,0,.5);
+}
+
+.header::after{
+content:"Luxury Hotel Management System";
+display:block;
+margin-top:10px;
+font-size:18px;
+color:#d1d5db;
+letter-spacing:3px;
+}
+
+/* الكرت الرئيسي */
+
+.box{
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.15);
+border-radius:30px;
+padding:50px;
+text-align:center;
+box-shadow:0 20px 50px rgba(0,0,0,.35);
+}
+
+.box h3{
+font-size:30px;
+margin-bottom:25px;
+color:white;
+}
+
+/* الروابط */
+
+a{
+display:inline-block;
+min-width:220px;
+padding:16px 25px;
+margin:12px;
+border-radius:15px;
+text-decoration:none;
+font-size:17px;
+font-weight:bold;
+color:white;
+transition:.35s;
+}
+
+/* دخول */
+
+a:first-of-type{
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+}
+
+/* نظرة عامة */
+
+a:last-of-type{
+background:linear-gradient(135deg,#10b981,#059669);
+}
+
+a:hover{
+transform:translateY(-6px);
+box-shadow:0 20px 35px rgba(0,0,0,.35);
+}
+
+/* الجوال */
+
+@media(max-width:768px){
+
+.container{
+padding:15px;
+}
+
+.header h1{
+font-size:38px;
+}
+
+.box{
+padding:30px 20px;
+}
+
+a{
+display:block;
+width:100%;
+margin:10px 0;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="header">
+<h1>فندق الخليدي</h1>
+</div>
+
+<div class="box">
+<h3>الدخول للنظام</h3>
+<a href="login.html">تسجيل الدخول</a>
+<a href="view.html">نظرة عامة</a>
+</div>
+</div>
+
+</body>
+</html>

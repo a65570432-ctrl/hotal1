@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فندق الخليدي - تسجيل الدخول</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Tahoma,sans-serif;
+}
+
+body{
+height:100vh;
+overflow:hidden;
+background:
+linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb")
+center/cover no-repeat;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:linear-gradient(135deg,rgba(0,0,0,.4),rgba(15,23,42,.6));
+}
+
+.box{
+position:relative;
+z-index:2;
+width:420px;
+max-width:92%;
+padding:40px;
+border-radius:30px;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 20px 50px rgba(0,0,0,.35);
+text-align:center;
+}
+
+h1{color:#fbbf24;margin-bottom:10px;}
+h2{color:#e5e7eb;margin-bottom:25px;font-weight:400;}
+
+input{
+width:100%;
+padding:15px;
+margin:10px 0;
+border:none;
+outline:none;
+border-radius:14px;
+background:rgba(255,255,255,.18);
+color:white;
+}
+
+button{
+width:100%;
+padding:15px;
+margin-top:15px;
+border:none;
+border-radius:14px;
+font-weight:bold;
+cursor:pointer;
+color:white;
+background:linear-gradient(135deg,#fbbf24,#d97706);
+transition:.3s;
+}
+
+button:hover{
+transform:translateY(-4px);
+}
+
+#msg,#msg2{
+margin-top:15px;
+color:#f87171;
+font-weight:bold;
+}
+
+.toggle{
+margin-top:10px;
+color:#fff;
+cursor:pointer;
+text-decoration:underline;
+font-size:14px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+
+<h1>AL-KHALIDI HOTEL</h1>
+<h2>Login System</h2>
+
+<input id="name" placeholder="اسم المستخدم">
+<input id="password" type="password" placeholder="كلمة المرور">
+
+<button onclick="login()">Enter</button>
+
+<div class="toggle" onclick="showRegister()">
+إنشاء حساب جديد
+</div>
+
+<p id="msg"></p>
+
+</div>
+
+<!-- REGISTER -->
+<div class="box" id="registerBox" style="display:none;">
+
+<h1>AL-KHALIDI HOTEL</h1>
+<h2>إنشاء حساب</h2>
+
+<input id="r_name" placeholder="اسم المستخدم الجديد">
+<input id="r_password" type="password" placeholder="كلمة المرور">
+
+<button onclick="register()">Register</button>
+
+<div class="toggle" onclick="showLogin()">
+رجوع لتسجيل الدخول
+</div>
+
+<p id="msg2"></p>
+
+</div>
+
+<script>
+
+
+/* LOGIN */
+function login(){
+
+let name = document.getElementById("name").value;
+let password = document.getElementById("password").value;
+let msg = document.getElementById("msg");
+
+if(name=="" || password==""){
+msg.innerText="الرجاء ادخال الاسم والرمز";
+return;
+}
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+let user = users.find(u => u.name === name && u.password === password);
+
+if(!user){
+msg.innerText="اسم المستخدم أو كلمة المرور غير صحيحة";
+return;
+}
+
+/* ضمان وجود role */
+if(!user.role){
+user.role = "customer";
+}
+
+localStorage.setItem("currentUser", JSON.stringify(user));
+
+if(user.role === "admin"){
+window.location.href = "admin.html";
+}
+else if(user.role === "employee"){
+window.location.href = "employee.html";
+}
+else{
+window.location.href = "customer.html";
+}
+
+}
+function register(){
+
+let name = document.getElementById("r_name").value;
+let password = document.getElementById("r_password").value;
+let msg = document.getElementById("msg2");
+
+if(name=="" || password==""){
+msg.innerText="اكتب البيانات كاملة";
+return;
+}
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+/* تأكد ما فيه تكرار */
+let exists = users.find(u => u.name === name);
+
+if(exists){
+msg.innerText="اسم المستخدم موجود مسبقاً";
+return;
+}
+
+let newUser = {
+name: name,
+password: password,
+role: "customer"
+};
+
+users.push(newUser);
+
+/* حفظ بعد التسجيل */
+localStorage.setItem("users", JSON.stringify(users));
+
+/*  تسجيل دخول مباشر بعد التسجيل */
+localStorage.setItem("currentCustomer", JSON.stringify(newUser));
+
+msg.innerText="تم إنشاء الحساب... سيتم التحويل";
+
+setTimeout(()=>{
+window.location.href = "customer.html";
+});
+
+}
+
+/* تبديل الصفحات */
+function showRegister(){
+document.getElementById("loginBox").style.display="none";
+document.getElementById("registerBox").style.display="block";
+}
+
+function showLogin(){
+document.getElementById("loginBox").style.display="block";
+document.getElementById("registerBox").style.display="none";
+}
+
+</script>
+
+</body>
+</html>

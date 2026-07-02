@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+
+<!-- يجعل الموقع مناسب لكل الشاشات -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>الزبون - فندق الخليدي</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Tahoma,sans-serif;
+}
+
+body{
+min-height:100vh;
+padding:25px;
+color:white;
+background:
+linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+url("https://images.unsplash.com/photo-1566073771259-6a8506099945")
+center/cover fixed;
+}
+
+/* 
+   عنوان الفندق */
+
+h2{
+text-align:center;
+font-size:42px;
+font-weight:700;
+margin-bottom:10px;
+text-shadow:0 5px 20px rgba(0,0,0,.5);
+}
+
+.title{
+text-align:center;
+font-size:18px;
+opacity:.9;
+margin-bottom:30px;
+letter-spacing:1px;
+}
+
+/*  الكروت الزجاجية  */
+
+.box{
+max-width:650px;
+margin:auto;
+margin-bottom:20px;
+padding:25px;
+border-radius:25px;
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.15);
+box-shadow:0 15px 35px rgba(0,0,0,.3);
+transition:.4s;
+}
+
+.box:hover{
+transform:translateY(-5px);
+}
+
+h3{
+margin-bottom:15px;
+font-size:25px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:none;
+outline:none;
+border-radius:12px;
+background:rgba(255,255,255,.15);
+color:white;
+font-size:15px;
+}
+
+input::placeholder{
+color:#ddd;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:15px;
+font-weight:bold;
+color:white;
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+transition:.35s;
+}
+
+button:hover{
+transform:translateY(-4px);
+box-shadow:0 15px 30px rgba(37,99,235,.45);
+}
+
+/* 
+   أزرار اللوحة حق البوكس حقي الشفافيى*/
+
+.panel-btn{
+background:linear-gradient(135deg,#111827,#374151);
+}
+
+
+
+/*  قسم التواصل*/
+
+.contact{
+margin-top:20px;
+padding:20px;
+border-radius:18px;
+background:rgba(0,0,0,.25);
+text-align:center;
+border:1px solid rgba(255,255,255,.1);
+}
+
+.contact h4{
+margin-bottom:10px;
+color:#60a5fa;
+}
+
+.contact p{
+margin:8px 0;
+}
+
+/* عرض الحجوزات والفاتورة */
+
+#output{
+animation:show .4s ;
+}
+
+@keyframes show{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.hidden{
+display:none;
+}
+
+@media(max-width:768px){
+
+body{
+padding:15px;
+}
+
+h2{
+font-size:30px;
+}
+
+.title{
+font-size:15px;
+}
+
+.box{
+padding:18px;
+border-radius:20px;
+}
+
+button{
+font-size:14px;
+}
+
+}
+
+
+</style>
+</head>
+
+<body>
+
+<!-- عنوان الموقع -->
+<h2>فندق الخليدي</h2>
+<div class="title">نظام الحجز الإلكتروني للغرف</div>
+
+<!-- تسجيل الدخول -->
+<div id="loginBox" class="box">
+
+<h3>تسجيل الدخول</h3>
+
+<input id="name" placeholder="الاسم">
+<input id="phone" placeholder="الهاتف">
+<input id="id" placeholder="الهوية">
+
+<button onclick="login()">دخول</button>
+
+</div>
+
+<!--لوحة المستخدم-->
+<div id="panel" class="box hidden">
+
+<h3>القائمة</h3>
+
+<button class="panel-btn" onclick="goRooms()">الغرف</button>
+<button class="panel-btn" onclick="showBookings()">حجوزاتي</button>
+<button class="panel-btn" onclick="showInvoice()">الفاتورة</button>
+<button style="background:#ef4444" onclick="logout()">خروج</button>
+
+<!-- قسم التواصل -->
+<div class="contact">
+
+<h4>تواصل معنا</h4>
+
+<p>737480942</p>
+<p>info@alkhalidi-hotel.com</p>
+<p>اليمن - تعز - الحصب - مقابل مسجد الشيباني</p>
+
+</div>
+
+</div>
+
+<!-- عرض الحجوزات  والفاتورة -->
+<div id="output" class="box hidden"></div>
+
+<script>
+
+/* عناصر الصفحة */
+let loginBox = document.getElementById("loginBox");
+let panel = document.getElementById("panel");
+let output = document.getElementById("output");
+
+/* إذا المستخدم مسجل مسبقاً يعرض لي هوة*/
+let user = JSON.parse(localStorage.getItem("currentCustomer"));
+if(user) openPanel();
+
+/* تسجيل الدخول*/
+function login(){
+
+let nameVal = document.getElementById("name").value.trim();
+let phoneVal = document.getElementById("phone").value.trim();
+let idVal = document.getElementById("id").value.trim();
+
+/* التحقق من البيانات */
+if(!nameVal || !phoneVal || !idVal){
+    alert("أدخل البيانات كاملة");
+    return;
+}
+
+/* إنشاء مستخدم */
+let u = {
+name: nameVal,
+phone: phoneVal,
+id: idVal
+};
+
+/* حفظ المستخدم الحالي */
+localStorage.setItem("currentCustomer", JSON.stringify(u));
+
+/* حفظ في قائمة العملاء */
+let customers = JSON.parse(localStorage.getItem("customers")) || [];
+customers.push(u);
+localStorage.setItem("customers", JSON.stringify(customers));
+
+openPanel();
+}
+
+/* فتح لوحة المستخدم*/
+function openPanel(){
+loginBox.classList.add("hidden");
+panel.classList.remove("hidden");
+}
+
+/*  الذهاب لصفحة الغرف */
+function goRooms(){
+window.location = "rooms.html";
+}
+
+/*   عرض الحجوزات الخاصة بالمستخدم */
+function showBookings(){
+
+let u = JSON.parse(localStorage.getItem("currentCustomer"));
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+/* فلترة حجوزات المستخدم فقط :يعني اذي مصفوفة تقوم بالفحص بالفلتلرة بالتنقية*/
+let my = bookings.filter(b => b.customer == u.name);
+
+output.classList.remove("hidden");
+/* اذي تعمل عمل فحص للمصفوفة */
+output.innerHTML = my.length ?
+my.map(b => `
+<div class="box">
+<b>غرفة:</b> ${b.room}<br>
+<b>السعر:</b> ${b.price}<br>
+<b>التاريخ:</b> ${b.date || "بدون تاريخ"}
+</div>
+`).join("")
+:
+"لا يوجد حجوزات";
+}
+
+/*    حساب الفاتورة */
+function showInvoice(){
+
+let u = JSON.parse(localStorage.getItem("currentCustomer"));
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+/* حجوزات المستخدم تقوم بالفلترة تنقي */
+let my = bookings.filter(b => b.customer == u.name);
+
+/* حساب المجموع   */
+let total = my.reduce((sum, b) => {
+    let price = parseFloat(b.price);
+    if (isNaN(price)) price = 0;
+    return sum + price;
+}, 0);
+
+output.classList.remove("hidden");
+
+output.innerHTML = `
+<div class="box">
+
+عدد الحجوزات: ${my.length}<br>
+
+إجمالي الفاتورة: <b>${total} $</b>
+
+</div>
+`;
+}
+
+/*   تسجيل الخروج  */
+function logout(){
+localStorage.removeItem("currentCustomer");
+location.reload();
+}
+
+</script>
+
+</body>
+</html>

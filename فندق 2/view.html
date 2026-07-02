@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>نظرة عامة على الفندق</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Tahoma,sans-serif;
+}
+
+body{
+min-height:100vh;
+padding:20px;
+color:white;
+background:
+linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+url("https://images.unsplash.com/photo-1566073771259-6a8506099945")
+center/cover fixed;
+}
+
+/* زر الرجوع */
+
+.back-btn{
+position:fixed;
+top:20px;
+left:20px;
+width:55px;
+height:55px;
+border:none;
+border-radius:50%;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(12px);
+color:white;
+font-size:22px;
+cursor:pointer;
+z-index:1000;
+transition:.3s;
+}
+
+.back-btn:hover{
+transform:translateY(-3px);
+background:#2563eb;
+}
+
+/* اسم الطالب */
+
+.student-name{
+position:fixed;
+top:20px;
+right:20px;
+padding:10px 18px;
+border-radius:30px;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(12px);
+color:white;
+font-weight:bold;
+z-index:1000;
+}
+
+/* الحاوية */
+
+.container{
+max-width:1100px;
+margin:90px auto 0;
+}
+
+/* الهيدر */
+
+.header{
+text-align:center;
+margin-bottom:35px;
+}
+
+.header h1{
+font-size:60px;
+color:#fbbf24;
+margin-bottom:10px;
+text-shadow:0 8px 25px rgba(0,0,0,.4);
+}
+
+.header h3{
+font-size:22px;
+font-weight:400;
+color:#e5e7eb;
+letter-spacing:2px;
+}
+
+/* البطاقات */
+
+.box{
+background:rgba(255,255,255,.12);
+backdrop-filter:blur(20px);
+border:1px solid rgba(255,255,255,.15);
+border-radius:25px;
+padding:25px;
+margin-bottom:20px;
+box-shadow:0 15px 35px rgba(0,0,0,.25);
+transition:.35s;
+}
+
+.box:hover{
+transform:translateY(-6px);
+}
+
+.box h3{
+margin-bottom:15px;
+font-size:24px;
+color:#60a5fa;
+}
+
+/* النصوص */
+
+p{
+line-height:2;
+font-size:17px;
+color:#f8fafc;
+}
+
+/* القوائم */
+
+ul{
+padding-right:25px;
+}
+
+li{
+margin-bottom:12px;
+font-size:16px;
+line-height:1.8;
+color:#f8fafc;
+}
+
+/* تأثير مميز */
+
+.box::before{
+content:"";
+display:block;
+width:70px;
+height:4px;
+border-radius:20px;
+background:linear-gradient(90deg,#fbbf24,#f59e0b);
+margin-bottom:15px;
+}
+
+/* الجوال */
+
+@media(max-width:768px){
+
+.container{
+margin-top:80px;
+}
+
+.header h1{
+font-size:38px;
+}
+
+.header h3{
+font-size:18px;
+}
+
+.box{
+padding:18px;
+}
+
+.student-name{
+font-size:12px;
+padding:8px 12px;
+}
+
+.back-btn{
+width:45px;
+height:45px;
+font-size:18px;
+}
+
+}
+
+@media(max-width:480px){
+
+.header h1{
+font-size:30px;
+}
+
+p,
+li{
+font-size:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- زر الرجوع -->
+<button class="back-btn" onclick="goBack()">خروج</button>
+
+<!-- اسم الطالب -->
+<div class="student-name">
+    ENG: Abdulrhman Ali
+</div>
+
+<!-- المحتوى -->
+<div class="container">
+
+    <!-- العنوان -->
+    <div class="header">
+        <h1>فندق الخليدي</h1>
+        <h3>نظرة عامة عن الفندق</h3>
+    </div>
+
+    <!-- وصف -->
+    <div class="box">
+        <p>
+            فندق الخليدي هو فندق حديث يوفر خدمات الإقامة والراحة للزبائن على مدار الساعة،
+            مع غرف متنوعة وخدمات فندقية مميزة تناسب جميع الاحتياجات.
+        </p>
+    </div>
+
+    <!-- معلومات -->
+    <div class="box">
+        <h3>معلومات الفندق</h3>
+        <ul>
+            <li>عدد الغرف: 30 غرفة</li>
+            <li>أنواع الغرف: مفردة - مزدوجة - أجنحة</li>
+            <li>خدمة 24 ساعة</li>
+            <li>إنترنت مجاني</li>
+            <li>خدمة غرف</li>
+        </ul>
+    </div>
+
+    <!-- خدمات -->
+    <div class="box">
+        <h3>الخدمات</h3>
+        <ul>
+            <li>حجز إلكتروني</li>
+            <li>تنظيف يومي</li>
+            <li>مطعم داخلي</li>
+            <li>مواقف سيارات</li>
+        </ul>
+    </div>
+
+    <!-- رؤية -->
+    <div class="box">
+        <h3>رؤية الفندق</h3>
+        <p>
+            نسعى لتقديم أفضل تجربة إقامة من خلال الراحة والنظافة
+            والخدمة الممتازة بأعلى جودة.
+        </p>
+    </div>
+
+</div>
+
+<script>
+
+/* زر الرجوع */
+function goBack(){
+    if(document.referrer){
+        window.location.href = document.referrer;
+    }else{
+        window.location.href = "index.html";
+    }
+}
+
+</script>
+
+</body>
+</html>
